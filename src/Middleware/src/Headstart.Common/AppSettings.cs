@@ -32,6 +32,8 @@ namespace Headstart.Common
     public class UI
     {
         public string BaseAdminUrl { get; set; }
+        public string BaseBuyerUrl { get; set; }
+
     }
 
     public class EnvironmentSettings
