@@ -28,6 +28,8 @@
     [dataIsSaving]="dataIsSaving"
     [addresses]="addresses"
     [orderCloudProduct]="resourceInSelection"
+    (deleteResource)="deleteResource()"
+    (createResource)="createResource($event)"
   >
   </app-product-edit>
 </resource-table-component>

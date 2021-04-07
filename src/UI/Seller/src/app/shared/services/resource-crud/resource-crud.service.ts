@@ -40,6 +40,7 @@ export abstract class ResourceCrudService<ResourceType> {
   secondaryResourceLevel = ''
   subResourceList: any[]
   emptyResource: any = {}
+  isUpdating = false
 
   private itemsPerPage = 100
 
@@ -89,7 +90,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async listResources(pageNumber = 1, searchText = ''): Promise<void> {
     const shouldList = await this.shouldListResources()
-    if (shouldList) {
+    if (shouldList && !this.isUpdating) {
       const {
         sortBy,
         search,
@@ -104,7 +105,7 @@ export abstract class ResourceCrudService<ResourceType> {
         sortBy,
         pageSize: this.itemsPerPage,
         filters,
-        searchType
+        searchType,
       }
       options = this.addIntrinsicListArgs(options)
       const resourceResponse = await this.listWithStatusIndicator(
@@ -301,6 +302,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async deleteResource(resourceID: string): Promise<null> {
+    this.isUpdating = true
     const args = await this.createListArgs([resourceID])
     await this.ocService.Delete(...args)
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter(
@@ -357,7 +359,10 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   searchBy(searchTerm: string): void {
-    this.patchFilterState({ search: searchTerm || undefined, searchType: searchTerm ? 'ExactPhrasePrefix' : undefined})
+    this.patchFilterState({
+      search: searchTerm || undefined,
+      searchType: searchTerm ? 'ExactPhrasePrefix' : undefined,
+    })
   }
 
   addFilters(newFilters: ListArgs): void {
@@ -436,7 +441,13 @@ export abstract class ResourceCrudService<ResourceType> {
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
     const { sortBy, search, searchType, OrderDirection, ...filters } = params
-    this.optionsSubject.next({ sortBy, search, searchType, filters, OrderDirection })
+    this.optionsSubject.next({
+      sortBy,
+      search,
+      searchType,
+      filters,
+      OrderDirection,
+    })
   }
 
   private async listWithStatusIndicator(
@@ -453,19 +464,21 @@ export abstract class ResourceCrudService<ResourceType> {
       } else {
         resourceResponse = await this.list(args)
       }
-      const successStatus = this.getSucessStatus(options, resourceResponse);
-      if(!isRetry && this.primaryResourceLevel === 'products' && successStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS') {
+      const successStatus = this.getSucessStatus(options, resourceResponse)
+      if (
+        !isRetry &&
+        this.primaryResourceLevel === 'products' &&
+        successStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS'
+      ) {
         isRetry = true
-        const retryOptions: Options = {...options, searchType: 'AnyTerm'}
+        const retryOptions: Options = { ...options, searchType: 'AnyTerm' }
         let retryResourceResponse = await this.list([retryOptions])
         this.resourceRequestStatus.next(
           this.getSucessStatus(retryOptions, retryResourceResponse)
         )
         return retryResourceResponse
       }
-      this.resourceRequestStatus.next(
-        successStatus
-      )
+      this.resourceRequestStatus.next(successStatus)
       return resourceResponse
     } catch (error) {
       this.resourceRequestStatus.next(ERROR)

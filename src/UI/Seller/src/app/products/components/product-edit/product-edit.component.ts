@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import {
   Component,
   Input,
@@ -93,6 +96,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   filterConfig
   @Output()
   updateResource = new EventEmitter<any>()
+  @Output()
+  deleteResource = new EventEmitter<any>()
+  @Output()
+  createResource = new EventEmitter<any>()
   @Input()
   addresses: ListPage<Address>
   @Input()
@@ -258,6 +265,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           .toPromise()
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew()
+    //this.createResource.emit(this._superHSProductEditable.Product)
     this.checkForChanges()
   }
 
@@ -546,12 +554,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  async handleDelete(): Promise<void> {
-    const accessToken = await this.appAuthService.fetchToken().toPromise()
-    await HeadStartSDK.Products.Delete(
-      this._superHSProductStatic.Product.ID,
-      accessToken
-    )
+  handleDelete(): void {
+    this.deleteResource.emit()
+
     this.router.navigateByUrl('/products')
   }
 
@@ -577,6 +582,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         )
       this.refreshProductData(superProduct)
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`)
+      this.createResource.emit(superProduct)
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
@@ -915,6 +921,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superHSProduct.Product.xp.Tax = null
     if (superHSProduct.PriceSchedule.PriceBreaks[0].Price === null)
       superHSProduct.PriceSchedule.PriceBreaks[0].Price = 0
+
     return await HeadStartSDK.Products.Post(superHSProduct)
   }
 
@@ -1000,13 +1007,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return (
-      this.imageFiles[0]?.URL ||
-      getProductMediumImageUrl(
-        this._superHSProductEditable?.Product,
-        this.appConfig.sellerID
+    if (this._superHSProductEditable?.Product !== undefined) {
+      return (
+        this.imageFiles[0]?.URL ||
+        getProductMediumImageUrl(
+          this._superHSProductEditable?.Product,
+          this.appConfig.sellerID
+        )
       )
-    )
+    }
   }
 
   ngOnDestroy(): void {
