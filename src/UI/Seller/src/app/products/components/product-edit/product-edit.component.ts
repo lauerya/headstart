@@ -554,9 +554,13 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleDelete(): void {
+  async handleDelete(): Promise<void> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise()
+    await HeadStartSDK.Products.Delete(
+      this._superHSProductStatic.Product.ID,
+      accessToken
+    )
     this.deleteResource.emit()
-
     this.router.navigateByUrl('/products')
   }
 

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config'

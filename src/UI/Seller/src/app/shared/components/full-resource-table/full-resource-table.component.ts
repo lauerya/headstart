@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Component, Input, Output, EventEmitter, Inject } from '@angular/core'
 import { FULL_TABLE_RESOURCE_DICTIONARY } from '@app-seller/shared/services/configuration/table-display'
 import { RequestStatus } from '@app-seller/models/resource-crud.types'

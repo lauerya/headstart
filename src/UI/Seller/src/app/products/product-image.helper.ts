@@ -1,8 +1,5 @@
 import { environment } from 'src/environments/environment.local'
-import {
-  HSProduct,
-  HSLineItem,
-} from '@ordercloud/headstart-sdk'
+import { HSProduct, HSLineItem } from '@ordercloud/headstart-sdk'
 
 export const IMAGE_HOST_URL =
   'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product'
@@ -13,6 +10,9 @@ export function getProductSmallImageUrl(
   product: HSProduct,
   sellerID: string
 ): string {
+  if (product === null || product === undefined) {
+    return
+  }
   return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`
 }
 
@@ -20,6 +20,9 @@ export function getProductMediumImageUrl(
   product: HSProduct,
   sellerID: string
 ): string {
+  if (product === null || product === undefined) {
+    return
+  }
   return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`
 }
 

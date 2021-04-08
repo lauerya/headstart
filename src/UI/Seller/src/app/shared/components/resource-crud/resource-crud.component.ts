@@ -80,8 +80,8 @@ export abstract class ResourceCrudComponent<ResourceType>
       .pipe(takeWhile(() => this.alive))
       .subscribe((resourceList) => {
         this.resourceList = resourceList
+
         this.changeDetectorRef.detectChanges()
-        this.ocService.isUpdating = false
       })
   }
 
@@ -100,6 +100,7 @@ export abstract class ResourceCrudComponent<ResourceType>
   subscribeToResourceSelection(): void {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.activatedRoute.params.subscribe(async (params) => {
+      this.ocService.isUpdating = false
       this.parentResourceID = await this.ocService.getParentResourceID()
       this.parentResourceIDSubject.next(this.parentResourceID)
       if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
@@ -197,7 +198,16 @@ export abstract class ResourceCrudComponent<ResourceType>
 
   async deleteResource(): Promise<void> {
     this.ocService.deleteResource(this.selectedResourceID)
-    void this.selectResource({})
+    //void this.selectResource({})
+  }
+
+  removeResource(): void {
+    this.ocService.isUpdating = true
+
+    this.ocService.resourceSubject.value.Items = this.ocService.resourceSubject.value.Items.filter(
+      (i: any) => i.ID !== this.selectedResourceID
+    )
+    this.ocService.resourceSubject.next(this.ocService.resourceSubject.value)
   }
 
   createResource(superProduct: any) {
