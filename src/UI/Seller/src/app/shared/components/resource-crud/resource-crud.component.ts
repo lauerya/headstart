@@ -197,8 +197,14 @@ export abstract class ResourceCrudComponent<ResourceType>
   }
 
   async deleteResource(): Promise<void> {
-    this.ocService.deleteResource(this.selectedResourceID)
-    //void this.selectResource({})
+    //this.ocService.deleteResource(this.selectedResourceID)
+    this.ocService.isUpdating = true
+
+    this.ocService.resourceSubject.value.Items = this.ocService.resourceSubject.value.Items.filter(
+      (i: any) => i.ID !== this.selectedResourceID
+    )
+    this.ocService.resourceSubject.next(this.ocService.resourceSubject.value)
+    void this.selectResource({})
   }
 
   removeResource(): void {

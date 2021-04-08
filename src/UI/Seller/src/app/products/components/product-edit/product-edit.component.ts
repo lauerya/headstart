@@ -561,7 +561,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       accessToken
     )
     this.deleteResource.emit()
-    this.router.navigateByUrl('/products')
+    //this.router.navigateByUrl('/products')
   }
 
   handleDiscardChanges(): void {
