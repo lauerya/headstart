@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Payment,
   Orders,
@@ -66,9 +67,7 @@ export class CheckoutService {
     return this.order
   }
 
-  async setShippingAddressByID(
-    address: HSAddressBuyer
-  ): Promise<HSOrder> {
+  async setShippingAddressByID(address: HSAddressBuyer): Promise<HSOrder> {
     try {
       await Orders.Patch('Outgoing', this.order.ID, {
         xp: { ShippingAddress: address },
@@ -87,16 +86,17 @@ export class CheckoutService {
     }
   }
 
-  async setOneTimeAddress(address: Address, addressType: AddressType): Promise<void> {
-    delete address.ID;
-    addressType === 'shipping' ? 
-      await Orders.SetShippingAddress('Outgoing', this.order.ID, address) : 
-      await Orders.SetBillingAddress('Outgoing', this.order.ID, address)
+  async setOneTimeAddress(
+    address: Address,
+    addressType: AddressType
+  ): Promise<void> {
+    delete address.ID
+    addressType === 'shipping'
+      ? await Orders.SetShippingAddress('Outgoing', this.order.ID, address)
+      : await Orders.SetBillingAddress('Outgoing', this.order.ID, address)
   }
 
-  async setBuyerLocationByID(
-    buyerLocationID: string
-  ): Promise<HSOrder> {
+  async setBuyerLocationByID(buyerLocationID: string): Promise<HSOrder> {
     const patch = {
       BillingAddressID: buyerLocationID,
       xp: { ApprovalNeeded: '' },
@@ -205,24 +205,30 @@ export class CheckoutService {
     return orderWorksheet
   }
 
-  async buildSupplierData(lineItems: HSLineItem[]): Promise<LineItemGroupSupplier[]> {
-    const supplierData = lineItems?.map(li => (
-      {
-        supplierID: li?.SupplierID,
-        ShipFromAddressID: li?.ShipFromAddressID
-      }
-    ))
+  async buildSupplierData(
+    lineItems: HSLineItem[]
+  ): Promise<LineItemGroupSupplier[]> {
+    const supplierData = lineItems?.map((li) => ({
+      supplierID: li?.SupplierID ?? null,
+      ShipFromAddressID: li?.ShipFromAddressID ?? null,
+    }))
     const uniqueSuppliers = uniqWith(supplierData, isEqual)
-    const supplierIDs = uniqueSuppliers.map(s => s.supplierID)
-    const suppliers = await Suppliers.List({filters: {'ID': supplierIDs.join("|")}})
-    const supplierItems: LineItemGroupSupplier[] = [];
-    for(const combo of uniqueSuppliers) {
-      const supplier = suppliers.Items.find(s => s.ID === combo.supplierID)
-      if(combo.supplierID && combo.ShipFromAddressID) {
-        const shipFrom = await SupplierAddresses.Get(combo.supplierID, combo.ShipFromAddressID);
-        supplierItems.push({supplier,shipFrom})
+    const supplierIDs = uniqueSuppliers.map((s) => s.supplierID)
+    const suppliers = await Suppliers.List({
+      filters: { ID: supplierIDs.join('|') },
+    })
+    const supplierItems: LineItemGroupSupplier[] = []
+    for (const combo of uniqueSuppliers) {
+      const supplier =
+        suppliers.Items.find((s) => s.ID === combo.supplierID) ?? null
+      if (combo.supplierID && combo.ShipFromAddressID) {
+        const shipFrom = await SupplierAddresses.Get(
+          combo.supplierID,
+          combo.ShipFromAddressID
+        )
+        supplierItems.push({ supplier, shipFrom })
       } else {
-        supplierItems.push({supplier, shipFrom: null})
+        supplierItems.push({ supplier, shipFrom: null })
       }
     }
     return supplierItems

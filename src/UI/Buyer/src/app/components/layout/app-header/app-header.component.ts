@@ -205,9 +205,9 @@ export class OCMAppHeader implements OnInit {
   }
 
   closeMiniCart(event: MouseEvent, popover: NgbPopover): void {
-    const rect = this.cartIcon.nativeElement.getBoundingClientRect()
+    const rect = this.cartIcon?.nativeElement?.getBoundingClientRect()
     // do not close if leaving through the bottom. That is handled by minicart itself
-    if (event.y < rect.top + rect.height) {
+    if (event.y < rect?.top + rect?.height) {
       popover.close()
     }
   }
