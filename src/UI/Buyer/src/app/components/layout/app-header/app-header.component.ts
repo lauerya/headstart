@@ -130,6 +130,7 @@ export class OCMAppHeader implements OnInit {
 
   async hasSuppliers(): Promise<boolean> {
     if (this.currentSupplierList == null) {
+      console.log("supplier list is null!")
       this.currentSupplierList = await this.context.supplierFilters.listSuppliers()
     }
     return this.currentSupplierList?.Meta?.TotalCount > 0

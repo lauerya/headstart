@@ -17,7 +17,6 @@ import { CurrentUserService } from '../current-user/current-user.service'
 import { CurrentOrderService } from '../order/order.service'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service'
-import { ApplicationInsightsService } from '../application-insights/application-insights.service'
 import { TokenHelperService } from '../token-helper/token-helper.service'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { AppConfig } from 'src/app/models/environment.types'
@@ -45,10 +44,9 @@ export class AuthService {
     private ordersToApproveStateService: OrdersToApproveStateService,
     private appConfig: AppConfig,
     private tokenHelper: TokenHelperService,
-    private appInsightsService: ApplicationInsightsService,
     private activatedRoute: ActivatedRoute,
     private baseResolveService: BaseResolveService
-  ) {}
+  ) { }
 
   // All this isLoggedIn stuff is only used in the header wrapper component
   // remove once its no longer needed.
@@ -99,11 +97,11 @@ export class AuthService {
     const anonUser = this.currentUser.get();
     const countryPatchObj = {
       xp: {
-        Country: anonUser?.xp?.Country || "US" 
+        Country: anonUser?.xp?.Country || "US"
       }
     }
-    const token = await Me.Register(me, {anonUserToken: anonToken.access_token})
-    const newUser = await Me.Patch(countryPatchObj, {accessToken: token.access_token})
+    const token = await Me.Register(me, { anonUserToken: anonToken.access_token })
+    const newUser = await Me.Patch(countryPatchObj, { accessToken: token.access_token })
     // temporary workaround for platform issue
     // need to remove and reset userGroups for newly registered user to see products
     // issue: https://four51.atlassian.net/browse/EX-2222
@@ -123,7 +121,6 @@ export class AuthService {
       this.appConfig.clientID,
       this.appConfig.scope
     )
-    this.appInsightsService.setUserID(userName)
     this.loginWithTokens(
       creds.access_token,
       creds.refresh_token,
@@ -131,7 +128,7 @@ export class AuthService {
       rememberMe
     )
     const urlParams = this.activatedRoute.snapshot.queryParams
-    if(urlParams.redirect){
+    if (urlParams.redirect) {
       void this.router.navigate([`/${urlParams.redirect}`])
     } else {
       void this.router.navigate(['/home'])
@@ -182,13 +179,13 @@ export class AuthService {
   }
 
   setCMSTokenIfNeeded(token: string) {
-    if(this.appConfig.cmsUrl && this.appConfig.cmsUrl !== '') {
+    if (this.appConfig.cmsUrl && this.appConfig.cmsUrl !== '') {
       ContentManagementClient.Tokens.SetAccessToken(token)
     }
   }
 
   removeCMSTokenIfNeeded() {
-    if(this.appConfig.cmsUrl && this.appConfig.cmsUrl !== '') {
+    if (this.appConfig.cmsUrl && this.appConfig.cmsUrl !== '') {
       ContentManagementClient.Tokens.RemoveAccessToken()
     }
   }
@@ -198,7 +195,6 @@ export class AuthService {
     this.removeCMSTokenIfNeeded()
     HeadStartSDK.Tokens.RemoveAccessToken()
     this.isLoggedIn = false
-    this.appInsightsService.clearUser()
     if (this.appConfig.anonymousShoppingEnabled) {
       await this.anonymousLogin()
       void this.router.navigate(['home']).then(async () => {
