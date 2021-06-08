@@ -116,7 +116,7 @@ const HeadstartRoutes: Routes = [
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(HeadstartRoutes)],
+  imports: [RouterModule.forRoot(HeadstartRoutes, { relativeLinkResolution: 'legacy' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

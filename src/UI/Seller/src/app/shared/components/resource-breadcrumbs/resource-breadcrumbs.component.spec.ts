@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute, Router } from '@angular/router'
-import { of } from 'rxjs/internal/observable/of'
+import { of } from 'rxjs/observable/of'
 
 import { ResourceBreadcrumbsComponent } from './resource-breadcrumbs.component'
 

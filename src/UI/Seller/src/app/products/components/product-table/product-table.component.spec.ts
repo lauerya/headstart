@@ -5,7 +5,7 @@ import { ProductService } from '@app-seller/products/product.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { OcSupplierService } from '@ordercloud/angular-sdk'
 import { UserContext } from '@app-seller/config/user-context'
-import { of } from 'rxjs/internal/observable/of'
+import { of } from 'rxjs/observable/of'
 
 describe('ProductTableComponent', () => {
   let component: ProductTableComponent
@@ -24,7 +24,7 @@ describe('ProductTableComponent', () => {
     getParentResourceID() {
       return 1
     },
-    getParentOrSecondaryIDParamName() {},
+    getParentOrSecondaryIDParamName() { },
   }
   const currentUserService = {
     getUserContext() {
@@ -38,7 +38,7 @@ describe('ProductTableComponent', () => {
   }
   const router = {
     navigateByUrl: jasmine.createSpy('navigateByUrl'),
-    url: { startsWith() {} },
+    url: { startsWith() { } },
     routerState: { snapshot: { url: 'url' } },
   }
   const activatedRoute = { queryParams: of({}), params: of({}) }

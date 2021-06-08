@@ -4,7 +4,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute, Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
 import { BuyerService } from '../../buyers/buyer.service'
-import { of } from 'rxjs/internal/observable/of'
+import { of } from 'rxjs/observable/of'
 import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
 
 describe('BuyerCategoryEdit', () => {
@@ -26,7 +26,7 @@ describe('BuyerCategoryEdit', () => {
     getMyResource() {
       return {}
     },
-    copyResource() {},
+    copyResource() { },
     getParentResourceID() {
       return 1
     },
