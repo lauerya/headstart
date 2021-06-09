@@ -3,7 +3,7 @@ import { Category, OcCategoryService } from '@ordercloud/angular-sdk'
 import { faSitemap, faBoxOpen } from '@fortawesome/free-solid-svg-icons'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Observable } from 'rxjs'
-import { flatMap } from 'rxjs/operators'
+import { mergeMap } from 'rxjs/operators'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppConfig } from '@app-seller/models/environment.types'
 
@@ -25,7 +25,7 @@ export class CategoryDetailsComponent implements OnInit {
     private ocCategoryService: OcCategoryService,
     private router: Router,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getCategoryData().subscribe((x) => (this.category = x))
@@ -33,7 +33,7 @@ export class CategoryDetailsComponent implements OnInit {
 
   getCategoryData(): Observable<Category> {
     return this.activatedRoute.params.pipe(
-      flatMap((params) => {
+      mergeMap((params) => {
         if (params.categoryID) {
           this.categoryID = params.categoryID
           return this.ocCategoryService.Get(this.catalogID, params.categoryID)

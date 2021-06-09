@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, throwError } from 'rxjs'
-import { catchError, filter, flatMap } from 'rxjs/operators'
+import { catchError, filter, mergeMap } from 'rxjs/operators'
 import { ApplicationInsightsService } from 'src/app/services/application-insights/application-insights.service'
 import { TokenHelperService } from 'src/app/services/token-helper/token-helper.service'
 import { AuthService } from '../../services/auth/auth.service'
@@ -20,10 +20,10 @@ import { AuthService } from '../../services/auth/auth.service'
 })
 export class RefreshTokenInterceptor implements HttpInterceptor {
   constructor(
-    private appAuthService: AuthService, 
-    private appInsightsSerivce: ApplicationInsightsService, 
+    private appAuthService: AuthService,
+    private appInsightsSerivce: ApplicationInsightsService,
     private tokenHelper: TokenHelperService
-  ) {}
+  ) { }
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
@@ -47,7 +47,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           if (refreshToken || this.appAuthService.fetchingRefreshToken) {
             return this.appAuthService.refreshToken.pipe(
               filter((token) => token !== ''),
-              flatMap((token) => {
+              mergeMap((token) => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
                 })
@@ -61,7 +61,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
           } else {
             // attempt refresh for new token
             return this.appAuthService.refresh().pipe(
-              flatMap((token) => {
+              mergeMap((token) => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
                 })

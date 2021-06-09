@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
-    "target": "es5",
+    "target": "es2015",
     "types": [
       "node"
     ],
@@ -22,6 +22,7 @@
     ],
     "lib": [
       "es2018",
+      "es2015",
       "dom"
     ]
   },
