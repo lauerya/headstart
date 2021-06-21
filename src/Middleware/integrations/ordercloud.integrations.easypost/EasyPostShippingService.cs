@@ -86,7 +86,7 @@ namespace ordercloud.integrations.easypost
                     {
 						return MockRatesForFreeShipping(lineItems.ToList());
 					}
-					if (easyPostResponses.Count() < 1)
+					if (easyPostResponses[0][0]?.rates?.Count() < 1)
                     {
 						return MockRatesForNoResponse(lineItems.ToList());
                     }
