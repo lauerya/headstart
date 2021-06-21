@@ -51,7 +51,7 @@ namespace ordercloud.integrations.easypost
 		private readonly EasyPostConfig _config;
 		private const string BaseUrl = "https://api.easypost.com/v2";
 		public const string FreeShipping = "FREE_SHIPPING";
-		public const string NoResponseShipping = "NO_RESPONSE_SHIPPING";
+		public const string NoResponseShipping = "BEST_DEAL_SHIPPING";
 
 		public EasyPostShippingService(EasyPostConfig config)
 		{
@@ -81,6 +81,8 @@ namespace ordercloud.integrations.easypost
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
 				{
+					return MockRatesForNoResponse(lineItems.ToList());
+
 					// If all line items in the list have FreeShipping, then Mock rates
 					if (lineItems.ToList().All(li => li.Product?.xp?.FreeShipping))
                     {
@@ -120,7 +122,7 @@ namespace ordercloud.integrations.easypost
 					new ShipMethod {
 						ID = NoResponseShipping + $"_{firstLi.SupplierID}",
 						Cost = Decimal.Round(firstLi.LineTotal * shippingCalcRate, 2),
-						Name = "TRANSIT_BY_TOTAL_RESPONSE",
+						Name = "Express",
 						EstimatedTransitDays = 1
 					}
 				},

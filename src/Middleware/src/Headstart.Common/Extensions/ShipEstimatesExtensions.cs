@@ -51,55 +51,7 @@ namespace Headstart.Common.Extensions
                 var supplier = suppliers.Items.FirstOrDefault(s => s.ID == supplierID);
                 var supplierLineItems = orderWorksheet.GetBuyerLineItemsBySupplierID(supplier?.ID);
                 var supplierSubTotal = supplierLineItems?.Select(li => li.LineSubtotal).Sum();
-                // TODO: Still waiting on decision makers to decide if we want
-                // Shipping Cost Schedules in HeadStart
-
-                //var validCostBreaks = supplier?.xp?.ShippingCostSchedule?.CostBreaks?.Where(costBreak => costBreak.OrderSubTotal < supplierSubTotal);
-
-                // Update Free Shipping Rates
-                if (shipEstimate.ID.StartsWith(ShippingConstants.FreeShippingID))
-                {
-                    foreach (var method in shipEstimate.ShipMethods)
-                    {
-                        method.ID = shipEstimate.ID;
-                        method.Cost = 0;
-                        method.EstimatedTransitDays = freeShippingTransitDays;
-                    }
-                }
-
-                foreach (var method in shipEstimate.ShipMethods)
-                {
-                    // Apply Free Shipping on orders where we weren't able to calculate a shipping rate
-                    if (method.ID == ShippingConstants.NoRatesID)
-                    {
-                        method.xp.FreeShippingApplied = true;
-                        method.xp.FreeShippingThreshold = supplier?.xp?.FreeShippingThreshold;
-                        method.Cost = 0;
-                    }
-                    // TODO: Still waiting on decision makers to decide if we want
-                    // Shipping Cost Schedules in HeadStart
-
-                    // If valid Cost Breaks exist, apply them
-                    //if (validCostBreaks != null)
-                    //{
-                    //    // Apply the Supplier Shipping Cost Schedule to Ground Rates only
-                    //    if (method.Name.Contains("GROUND"))
-                    //    {
-                    //        validCostBreaks = validCostBreaks.Where(cb => cb.ValidCountries.Contains(orderWorksheet?.Order?.FromUser?.xp?.Country));
-                    //        if (validCostBreaks != null && validCostBreaks.Count() > 0)
-                    //        {
-                    //            var sortedValidCostBreaks = validCostBreaks.OrderBy(costBreak => costBreak.OrderSubTotal);
-                    //            method.xp.ShippingCostScheduleOrderSubTotalThreshold = sortedValidCostBreaks.LastOrDefault().OrderSubTotal;
-                    //            method.xp.ShippingCostScheduleApplied = true;
-                    //            method.Cost = sortedValidCostBreaks.LastOrDefault().Cost;
-                    //            if (method.Cost == 0) // If cost = 0, then shipping is considered free
-                    //            {
-                    //                method.xp.FreeShippingApplied = true;
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                }
+ 
                 updatedEstimates.Add(shipEstimate);
             }
 

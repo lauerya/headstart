@@ -62,29 +62,11 @@ namespace Headstart.API.Commands
             var shipResponse = (await _shippingService.GetRates(groupedLineItems, _profiles)).Reserialize<HSShipEstimateResponse>(); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
-            for (var i = 0; i < groupedLineItems.Count; i++)
-            {
-                var supplierID = groupedLineItems[i].First().SupplierID;
-                var profile = _profiles.FirstOrDefault(supplierID);
-                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => profile.CarrierAccountIDs.Contains(s.xp.CarrierAccountID)).ToList(), profile);
-                shipResponse.ShipEstimates[i].ShipMethods = methods.Select(s =>
-                {
 
-                    // there is logic here to support not marking up shipping over list rate. But USPS is always list rate
-                    // so adding an override to the suppliers that use USPS
-                    var carrier = _profiles.ShippingProfiles.First(p => p.CarrierAccountIDs.Contains(s.xp?.CarrierAccountID));
-                    s.Cost = carrier.MarkupOverride ?
-                        s.xp.OriginalCost * carrier.Markup :
-                        Math.Min((s.xp.OriginalCost * carrier.Markup), s.xp.ListRate);
-
-                    return s;
-                }).ToList();
-            }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
             await shipResponse.ShipEstimates
                 .CheckForEmptyRates(_settings.EasyPostSettings.NoRatesFallbackCost, _settings.EasyPostSettings.NoRatesFallbackTransitDays)
-                .ApplyShippingLogic(worksheet, _oc, _settings.EasyPostSettings.FreeShippingTransitDays).Result
                 .ConvertCurrency(CurrencySymbol.USD, buyerCurrency, _exchangeRates);
 
             return shipResponse;

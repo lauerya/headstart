@@ -15,7 +15,7 @@ namespace ordercloud.integrations.avalara
 
 			var standardLineItems = order.LineItems.Where(li => li.Product.xp.ProductType == "Standard")?.ToList();
 
-			var shipingLines = order.ShipEstimateResponse.ShipEstimates.Select(shipment =>
+			var shipingLines = order.ShipEstimateResponse?.ShipEstimates?.Select(shipment =>
 			{
 				var (shipFrom, shipTo) = shipment.GetAddresses(order.LineItems);
 				var method = shipment.GetSelectedShippingMethod();
@@ -27,8 +27,12 @@ namespace ordercloud.integrations.avalara
 
 			var productLines = standardLineItems.Select(lineItem =>
 				 lineItem.ToLineItemModel(lineItem.ShipFromAddress, lineItem.ShippingAddress, exemptionNo));
+			if (shipingLines?.Count() < 1)
+            {
+				shipingLines = new List<LineItemModel> { };
+            }
 
-			return new CreateTransactionModel()
+				return new CreateTransactionModel()
 			{
 				companyCode = companyCode,
 				type = docType,
